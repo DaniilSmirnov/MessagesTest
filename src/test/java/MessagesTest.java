@@ -1,5 +1,7 @@
 import io.appium.java_client.MobileElement;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -30,9 +32,12 @@ public class MessagesTest {
     String vk_im_title = "com.vkontakte.android:id/vkim_title";
     String create_new_chat = "com.vkontakte.android:id/create_new_chat";
     String dialogs_refresh_status = "com.vkontakte.android:id/vkim_dialogs_refresh_status";
-    String title_dropdown = "com.vkontakte.android:id/title_dropdown";
+    String toolbar = "com.vkontakte.android:id/toolbar";
     String subtitle_text = "com.vkontakte.android:id/subtitle_text";
-
+    String about = "/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v4.view.ViewPager/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.FrameLayout[2]/android.widget.LinearLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]";
+    String count = "com.vkontakte.android:id/count";
+    String kick = "com.vkontakte.android:id/kick";
+    String invite = "com.vkontakte.android:id/invite";
 
     @BeforeMethod
     public void setup() throws MalformedURLException {
@@ -50,7 +55,7 @@ public class MessagesTest {
 
 
     @Test
-    public void basicTest() throws InterruptedException {
+    public void CreateConverstionTest() throws InterruptedException {
         //Переходим в раздел Сообщения
         driver.findElementById(tabMessages).click();
 
@@ -98,7 +103,7 @@ public class MessagesTest {
 
         //Вводим название беседы
         driver.findElementById(vk_im_title).click();
-        driver.findElementById(vk_im_title).sendKeys("Test");
+        driver.findElementById(vk_im_title).sendKeys("Appium");
 
         //Проверяем список пользователей в беседе
         int counter = 0;
@@ -112,15 +117,60 @@ public class MessagesTest {
         Assert.assertEquals(counter, 2);
 
 
-        //Создаем беседу и проверяем название, количество участников
+        //Создаем беседу
         driver.findElementById(create_new_chat).click();
-        //driver.getScreenshotAs("png");
-        driver.findElementById(title_dropdown).click();
-        Assert.assertEquals(driver.findElementById(title_dropdown).getText(), "Test");
-        Assert.assertEquals(driver.findElementById(subtitle_text).getText(),"2");
+        //driver.getScreenshotAs("png")
+    }
 
+    @Test
+    public void ConversationTest(){
+        //Переходим в раздел Сообщения
+        driver.findElementById(tabMessages).click();
 
+        List<MobileElement> elements = (List<MobileElement>) driver.findElementsByClassName("android.widget.TextView");
+        for (MobileElement element : elements) {
+            if (element.getText().contains("Appium")) {
+                element.click();
+                break;
+            }
+        }
 
+        //Проверяем беседу созданную до этого
+        //Assert.assertEquals(driver.findElementById(dialogs_refresh_status).getText(), "Appium");
+        Assert.assertEquals(driver.findElementById(subtitle_text).getText(),"2 участника");
+
+        //Раскрываем меню
+        driver.findElementById(toolbar).click();
+
+        //Переходим в информацию о беседе
+        driver.findElementByXPath(about).click();
+
+        //Проверяем название беседы в поле
+        Assert.assertEquals(driver.findElementByClassName("android.widget.EditText").getText(), "Appium");
+        //Проверяем количество участников
+        Assert.assertEquals(driver.findElementById(count).getText(), "2 участника");
+        //Исключаем участника
+        int x = 10;
+        int y = 0;
+        while (true) {
+            new TouchAction(driver).press(PointOption.point(x, y)).moveTo(PointOption.point(x, y+=10)).release().perform();
+            if (driver.findElementById(kick).isDisplayed()){
+                driver.findElementById(kick).click();
+                break;
+            }
+        }
+
+        //Проверяем количество участников
+        while (true) {
+            new TouchAction(driver).press(PointOption.point(x, y)).moveTo(PointOption.point(x, y+=10)).release().perform();
+            if (driver.findElementById(count).isDisplayed()){
+                Assert.assertEquals(driver.findElementById(count).getText(), "1 участник");
+                break;
+            }
+        }
+
+        //Добавляем участника в беседу
+        driver.findElementById(invite).click();
 
     }
 
