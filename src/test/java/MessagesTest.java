@@ -127,6 +127,7 @@ public class MessagesTest {
         //Переходим в раздел Сообщения
         driver.findElementById(tabMessages).click();
 
+        //Ищем диалог и заходим в него
         List<MobileElement> elements = (List<MobileElement>) driver.findElementsByClassName("android.widget.TextView");
         for (MobileElement element : elements) {
             if (element.getText().contains("Appium")) {
@@ -161,6 +162,8 @@ public class MessagesTest {
         }
 
         //Проверяем количество участников
+        x = 10;
+        y = 0;
         while (true) {
             new TouchAction(driver).press(PointOption.point(x, y)).moveTo(PointOption.point(x, y+=10)).release().perform();
             if (driver.findElementById(count).isDisplayed()){
@@ -171,6 +174,20 @@ public class MessagesTest {
 
         //Добавляем участника в беседу
         driver.findElementById(invite).click();
+        driver.findElementById(search).click();
+        driver.findElementById(search).sendKeys("Влад Камызякин");
+        elements.clear();
+        elements = (List<MobileElement>) driver.findElementsByClassName("android.widget.TextView");
+        for (MobileElement element : elements) {
+            if (element.getText().contains("Камызякин")) {
+                element.click();
+                break;
+            }
+        }
+        driver.findElementById(search_clear).click();
+        driver.findElementById(search_done).click();
+
+
 
     }
 
