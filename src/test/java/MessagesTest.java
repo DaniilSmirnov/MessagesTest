@@ -14,7 +14,6 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class MessagesTest {
 
@@ -148,8 +147,10 @@ public class MessagesTest {
 
         //Проверяем название беседы в поле
         Assert.assertEquals(driver.findElementByClassName("android.widget.EditText").getText(), "Appium");
+
         //Проверяем количество участников
         Assert.assertEquals(driver.findElementById(count).getText(), "2 участника");
+
         //Исключаем участника
         int x = 10;
         int y = 0;
@@ -186,6 +187,17 @@ public class MessagesTest {
         }
         driver.findElementById(search_clear).click();
         driver.findElementById(search_done).click();
+
+        //Проверяем количество
+        x = 10;
+        y = 0;
+        while (true) {
+            new TouchAction(driver).press(PointOption.point(x, y)).moveTo(PointOption.point(x, y+=10)).release().perform();
+            if (driver.findElementById(count).isDisplayed()){
+                Assert.assertEquals(driver.findElementById(count).getText(), "1 участник");
+                break;
+            }
+        }
 
 
 
